@@ -76,18 +76,19 @@ SECURING THE BUSINESS VALUE OF THE EUROPEAN BUSINESS WALLET (EBW)**
 
 ## 2.1 “WE BUILD" Consortium[^1] (WBC) lessons learned: Independent issuing of EAAs by EBW owners is mandatory
 
-An important lesson learned from the specification and pilot operation of WBC is that independent (self)-issuing of EAAs by the EBW owner is a mandatory requirement for the implementation of important use cases like Know your Supplier, Know your Customer and Corporate Banking.
+An important lesson learned from the specification and pilot operation of WBC is that independent (self)-issuing of EAAs (SELF-EAA) by the EBW owner is a mandatory requirement for the implementation of important use cases like Know your Supplier, Know your Customer and Corporate Banking.
+The demand to independently issue EAAs complements the demand for attestations issued by QTSP’s.
 
 - **Mandatory onboarding data can be provided only by the owner:** A small supplier must provide the same basic attributes (UBO, Control and Ownership Structure, …) as a multinational enterprise to clear compliance (KYC, KYS, open bank account). This data can be provided only by the legal entity itself to its business partners. They are not completely available in official registries (e.g. owners outside the EU)
 
 - **Majority of attestations are EAA:** The number of required EAAs is already significantly higher than the number of Public EAAs (PUB-EAAs) and Qualified EAAs (QEAAs) combined. Means going in operation area will have definitly more EAA ( ex. invoice, receipt, iban, sites, quality company certificates...)  
   **Table 1: EAA Requirements in Core WBC Use Cases for first pilot iteration (MVP)**
 
-| Use Case                                                 | Minimum Required EAAs | QEAAs Required | PUB-EAAs Required |
+| Use Case                                                 | Required EAAs         | QEAAs Required | PUB-EAAs Required |
 |----------------------------------------------------------|-----------------------|----------------|-------------------|
-| KYC – Financial Sector (e.g., Open Bank Account Service) | 7                     | 3              | 1                 |
-| KYS – Supplier Onboarding                                | 6                     | 3              | 0                 |
-| KYC – Non-Financial Sector                               | 4                     | 2              | 0                 |
+| KYC – Financial Sector (e.g., Open Bank Account Service) | 7-14                  | 3-4            | 1                 |
+| KYS – Supplier Onboarding                                | 5-12                  | 2-3            | 1                 |
+| KYC – Non-Financial Sector                               | 3-11                  | 2-4            | 1                 |
 
 Note: Many required data points (e.g., Ultimate Beneficial Owner (UBO) data required by banks under AMLR) do not exist in official registries because they have no access to registries outside of the EU and therefore must be self-asserted by the company.
 
@@ -98,7 +99,16 @@ Note: Many required data points (e.g., Ultimate Beneficial Owner (UBO) data requ
 
 ## 2.2 Case Study: Why External QTSPs Cannot Assure Liability for Issued Bank Credentials
 
-… this section will be updated on Monday 19’th of September.
+To assess the feasibility of different issuance models, a joint evaluation was conducted by Bosch, Deutsche Bank, and a QTSP. This discussion clarified the distinct and complementary roles of authoritative data sources (like banks) and Qualified Trust Service Providers (QTSPs) in the ecosystem.
+The central conclusion is that a balanced approach is required. The EU’s Trusted-List (TL) framework, which governs QTSPs, provides the essential foundation of legal accountability and identity verification for the entire system.
+The evaluation highlighted two key points:
+1.	The Authoritative Source Principle: For certain highly sensitive or dynamic attributes, such as IBAN account ownership, the bank remains the sole authoritative source of truth. A third-party QTSP cannot independently verify this information in real-time due to structural barriers like banking secrecy and data security. In this model, the QTSP's primary role is to securely verify the identity of the issuer (the bank), while the bank, as the issuer, remains liable for the accuracy of the data itself.
+2.	The Value of the QTSP Framework: For other types of credentials, the existing QTSP framework provides a robust and trusted mechanism for issuance. QTSPs are subject to rigorous liability and audit requirements under eIDAS, and when they issue credentials (like a QEAA), they ground them in clear legal accountability. This model should be leveraged where appropriate.
+   
+This analysis confirms that a one-size-fits-all, mandatory intermediation by a third party for all types of attestations is not practical. 
+The most secure and viable model is a flexible one: allowing authoritative sources (like a bank) to issue data directly, using a legal identity that has been rigorously verified by a QTSP. This approach respects the established eIDAS trust framework while accommodating the structural realities of sensitive corporate data.
+The same applies to other EAAs like UBO, Control Structure, Ownership Structure,… and other attestations which need to be issued by the EBW owner. 
+
 
 ## 2.3 Self-Assertion is Not a Trust Service
 
