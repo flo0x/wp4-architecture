@@ -37,7 +37,7 @@ This decision entails the following architectural commitments:
 
 ## 3. Foundational Principle: Long-Term Validation (LTV)
 
-A core principle underpinning this architecture is the requirement for **Long-Term Validation (LTV)**. For any long-lived attestation, a verifier's wallet must be able to determine the validity of a credential and its signature chain *at the time the attestation was issued*, not at the current time.
+A core principle underpinning this architecture is the requirement for **Point-in-Time Validation or Long-Term Validation (LTV)**. For any attestation, a verifier's wallet must be able to determine the validity of a credential and its signature chain *at the time the attestation was issued*, not at the current time.
 
 This involves validating each credential in the chain (EAA, Issuing Attestation, EBWOID) against its respective validity period and historical revocation status at the moment of issuance. LTV is a baseline capability required for most We Build use cases involving archival, compliance, or legally binding records.
 
@@ -47,7 +47,8 @@ The specific mechanisms to achieve LTV, including the use of trusted timestamps 
 
 ### What Becomes Easier or Possible?
 
-*   **Massive Scalability:** The ecosystem can scale to millions of EAA Providers without creating an administrative bottleneck at national TLoLs.
+*   **Massive Scalability without Administrative Overhead** The ecosystem can scale to millions of EAA Providers without creating an administrative bottleneck at national TLoLs. No EBW owner needs to register anywhere.
+*   **Worldwide Verifiability** Every EBW Owner who has read access to the TLoL and trust the EU Supervisory Bodies can verify all received attestations.
 *   **Immediate Viability:** This solution can be piloted and deployed rapidly, as it relies on existing PKI principles and standards. It does not require new EU-level legislation or the creation of new, complex, centralized API infrastructures across all Member States.
 *   **Archival and Compliance:** The model inherently supports long-lived, non-revocable attestations (e.g.,supply chain attestations required for KyS and KyC, diplomas, product passports, material composition records), as verification is completely independent of the issuer's operational status.
 *   **Provider Autonomy:** EAA Providers can issue attestations autonomously using their own wallets once they possess a valid EBWOID.
