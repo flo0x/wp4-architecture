@@ -10,13 +10,24 @@ While the previous chapter describes the regulatory and architectural frameworks
 
 ## The Ecosystem at a Glance
 The EUDI Wallet and EBW ecosystem follows the common three-party attestation model. In this model, three primary actors interact: issuer, holder and verifier. A trust framework supports these actors by providing the trust anchors used for validation.
-1. **Holder** – the wallet controlled by a natural or legal person.
+1. **Holder** – Natural person or economic operator receiving, storing and sharing credentials.
 2. **Issuer** – an entity that issues attestations to the Holder.
-3. **Verifier** – a relying party that receives and validates attestations presented by the Holder.
+3. **Verifier** – an economic operator or natural person that requests and verifies the authenticity and validity of a holder's credential.
 4. **Trust framework** – the infrastructure used to validate trust relationships between ecosystem participants (described in Chapter 6).
 
+The diagram below shows the **WE BUILD reference pattern** for the ecosystem.
+
+![Ecosystem overview](../images/ecosystem-overview.png)
+*Figure 1: WE BUILD reference pattern for the EUDIW / EBW ecosystem.*
+
+In this reference pattern, Issuers use the issuance capabilities of the European Business Wallet (EBW) to issue attestations to the Holder; the Holder uses the EUDI Wallet (for natural persons) or the European Business Wallet (for economic operators) to present attestations to the Verifier; and Verifiers use the verification capabilities of the European Business Wallet to validate the attestations presented by the Holder. The foundation of the ecosystem is the Trust framework, where Issuers publish keys, identifiers and schemas, and Verifiers register as Relying Parties.
+
+The EBW is an architectural construct (a defined role and set of capabilities), not a regulated entity, certification artefact, or deployment specification. The reference pattern is what the WE BUILD pilots are designed to evidence; it does not preclude conformant implementations that follow a different architectural choice. Regulatory paths follow the attestation tier: QEAAs are issued via the QEAASP path under eIDAS2 with the EBW operating outside that certified scope, while PuB-EAAs (including the EBWOID) are anchored in the relevant authentic source.
+
 ## System Landscape
+
 The diagram below illustrates the baseline trust topology of the EU wallet ecosystem. Issuers provide attestations to holders, holders present them to verifiers, and all actors validate trust relationships using the trusted lists.
+The trusted lists specify the recognised participants in schemes for electronic identification and trust services.
 
 ```mermaid
 %% Baseline trust topology of the EU wallet ecosystem
@@ -40,39 +51,46 @@ flowchart TB
     class trust component;
 ```
 
-WE BUILD focuses primarily on wallets for economic operators. 
-In these scenarios, qualified electronic registered delivery services (QERDS) support trusted messaging between participants. 
-Accordingly, interactions between issuers, holders and verifiers may be routed through a Qualified Trust Service Provider (QTSP) operating a QERDS. 
-The European Digital Directory provides digital addressing for secure routing of documents and notifications.
+WE BUILD focuses primarily on wallets for economic operators and public sector bodies. 
+In these scenarios, qualified electronic registered delivery services (QERDS) support trusted messaging between recognised participants. 
+Accordingly, interactions between data senders and receipients may be routed through a Qualified Trust Service Provider (QTSP) providing a QERDS. 
+The QTSP is recognised in a scheme for trust services, just like in the previous diagram, enabling other participants to verify QERDS evidence issued by the QTSP.
+The WE BUILD Digital Directory (simulating the European Digital Directory) provides economic and public sector bodies with digital addressing for secure routing of documents and notifications.
 
-In WE BUILD, the ecosystem typically includes the following additional components:
+QERDS is a payload-agnostic transport; within WE BUILD, its application focuses on document submissions and notifications.
+
+While this model can apply to any data transmission, the application of QERDS in WE BUILD focuses on document submissions and notifications.
+The QERDS provides an additional interaction model in the WE BUILD ecosystem, complementary to the issuer-holder-verifier model above:
 
 ```mermaid
-%% WE BUILD trust topology with QTSP/QERDS and European Digital Directory
-flowchart TB
-    issuer["Issuer&nbsp;&nbsp;"]
-    holder["Holder&nbsp;&nbsp;"]
-    verifier["Verifier&nbsp;&nbsp;"]
-    qtsp["QTSP / QERDS&nbsp;&nbsp;"]
-    directory["European Digital<br/>Directory"]
+%% WE BUILD additional trust topology with the QERDS and the European Digital Directory
+graph TB
+    Directory["WE BUILD<br>Digital Directory"]
+    TL["WE BUILD<br>Trusted Lists"]
+    subgraph Users[Wallet users]
+      direction LR
+      SenderBW["Business<br>Wallet"]
+      RecipientBW["Business<br>Wallet"]
+      Sender-->|"uses"|SenderBW
+      RecipientBW-->|"is used by"|Recipient
+    end
+    SenderBW-->|"submits documents using the QERDS to"|RecipientBW
+    SenderBW-->|"uses the QERDS to notify"|RecipientBW
+    Users-->|"discover wallet services and capabilities using"|Directory
+    Users-->|"validate QERDS evidence against"|TL
 
-    issuer -->|"issues EBWOID &<br/>attestations"| holder
-    holder -->|"presents attestations<br/>(selective disclosure)"| verifier
-    issuer -.->|"signing/sealing certificates &<br/>revocation via QERDS"| qtsp
-    holder -.->|"transmits/receives documents &<br/>signs/seals"| qtsp
-    verifier -.->|"sends/receives<br/>notifications via QERDS"| qtsp
-    qtsp -->|"routes via<br/>digital addresses"| directory
-    holder -.->|"registers<br/>digital address"| directory
-
-    %% Styling
+    classDef group fill:#ffffff,stroke:#d6b656,stroke-width:2px,color:#000;
     classDef primaryRole fill:#fff2cc,stroke:#d6b656,stroke-width:2px,color:#000;
     classDef component fill:#e1d5e7,stroke:#9673a6,stroke-width:2px,color:#000;
     classDef governance fill:#f8cecc,stroke:#b85450,stroke-width:2px,color:#000;
 
-    class issuer,holder,verifier primaryRole;
-    class qtsp component;
-    class directory governance;
+    class Users group
+    class Sender,Recipient primaryRole
+    class SenderBW,RecipientBW component
+    class Directory,TL governance
 ```
+
+The ecosystem supports both interaction patterns for exchanging data: delivery with evidence, implemented by the QERDS, and holder-mediated presentation, following the issuer-holder-verifier model. The two compose: artefacts from either pattern can be carried or referenced over either channel where a use case requires it.
 
 ## Wallet Types in WE BUILD 
 
@@ -80,14 +98,30 @@ WE BUILD supports wallet solutions for both natural persons and economic operato
 
 Natural persons interact through EUDI Wallets, which enable individuals to authenticate and present personal identity attributes. Economic operators interact through EBW, which enable organisations to manage and present business-related attestations such as representation rights or organisational attributes.
 
-From a deployment perspective, wallet solutions can be implemented in several ways depending on the target users, operational requirements, and cryptographic architecture. In practice, three main implementation approaches are relevant within the WE BUILD ecosystem.
+From a deployment perspective, wallet solutions can be implemented in several ways depending on the target users, operational requirements, and cryptographic architecture. Three implementation approaches are relevant within the WE BUILD ecosystem, distinguished by where the wallet runs and where its keys are protected.
 
-| Wallet type | Typical context | Characteristics |
+| Wallet type | Where the wallet runs and its keys are protected | Typical context |
 |---|---|---|
-| **Mobile wallets (on-device)** | Natural persons | Wallet application running on a user’s smartphone, with credentials stored and used locally on the device. |
-| **Server or Web-based wallets** | Economic operators | Wallet services operated in backend infrastructure and accessed through Web interfaces or enterprise systems. |
-| **Hybrid wallets** | Both contexts | Combine device-based interaction with backend cryptographic infrastructure. |
+| **On-device** | Wallet Instance on the user's device, with keys protected by a WSCD on that device. | Natural persons, and use cases that require proximity or offline presentation. |
+| **Remote / server-side** | Wallet service operated in backend infrastructure, with keys protected by a server-side WSCD, typically an HSM. | Economic operators, managed services and large-scale deployments. |
+| **Hybrid** | Combines a device WSCD with a server-side WSCD. | Deployments that need both scale and offline capability. |
 
-The underlying cryptographic architecture of wallets is defined in the ARF and related standards. This Blueprint therefore focuses on the interactions and interoperability patterns relevant for WE BUILD rather than repeating the detailed wallet architecture definitions.
+The user interface is a separate question. The ARF notes that a Wallet Instance can also be a web application, so a browser-based interface can sit on top of any of the three approaches.
 
-In practice, most deployments follow a mobile-first approach for natural persons and a server-based or enterprise-integrated approach for economic operators. Hybrid architectures may also be used to combine device-based user interaction with backend cryptographic services.
+The underlying cryptographic architecture of EUDI wallets is defined in the ARF and related standards. This Blueprint therefore focuses on the interactions and interoperability patterns relevant for WE BUILD rather than repeating the detailed wallet architecture definitions.
+
+In practice, most deployments follow a mobile-first approach for natural persons and a server-based or enterprise-integrated approach for economic operators. Hybrid architectures may also be used to combine device-based user interaction with backend cryptographic services. Appendix E sets out the deployment patterns reported by WE BUILD wallet providers.
+
+```mermaid
+flowchart TB
+    LE["Economic operator /<br>public sector body"] -.-> |controls| EBW
+    NP["Natural person"] -.-> |represents| LE
+    NP -.-> |controls| EUDI
+    EUDI["EUDI Wallet&nbsp;&nbsp;"]-.-> |presents PID to| EBW
+    EP["EBWOID provider"] -.-> |issues EBWOID to| EBW
+    LE -.-> |"registered with<br>(in case of a company)"| BReg
+    LE -.-> |registered with| EP
+    BReg["Business registry"] -.-> |issues EU Company Certificate to| EBW
+```
+
+Unlike natural person wallets which reside on mobile devices, the EBW typically operates in cloud or on-premises server environments. To secure these deployments, the ecosystem mandates a **Business Wallet Unit Attestation (BWUA)** based on the ETSI TS3 framework. The BWUA cryptographically binds the wallet to a secure server-side cryptographic environment—such as a cloud HSM or organisation-controlled HSM. It comprises a Business Wallet Instance Attestation (BWIA) issued by the Wallet Provider and a Server Key Attestation (SKA) proving that private keys are securely protected.

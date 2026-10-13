@@ -1,71 +1,179 @@
-# Context
+# Mutual identification for European Business Wallet presentation requests
 
-What is forcing us to make this decision? What was the tradeoff?
+**Authors/Contributors:**
 
-1. Perspective of the Holder, Relying Party, Wallet Provider roles
+- Florin Coptil, Bosch, Germany
+- Werner Folkendt, Bosch, Germany
+- Lal Chandran, iGrant.io, Sweden
+- George J Padayatti, iGrant.io, Sweden
+- Eelco Klaver, Credenco, The Netherlands
+- Leif Johansson, SIROS Foundation, Sweden
+- Niels Klomp, Sphereon, The Netherlands
+- <Please add more .. >
 
-Perspective of the EBW owner in the Holder role:
+**Obsoletes:** N/A
 
-An EBW Owner in the Holder role stores highly confidential data in his EBW (e.g. UBO, Control Structure,...) that need to trated confidential and securely. Therefore a EBW Relying Party request for confidential data will be answered by the holder EBW only after the requesters identity and authorization and also the requesting software authenticity and validity (e.g. based on the WUA, if the request is made by an EBW) was validated by the Holders EBW.  
+## Context
 
-According to EU Business Wallet regulation Article 14/2/b"...Wallet units shall enable authentication and validation of the wallet unit components by presenting the wallet unit attestations…". 
+An EBW in the Holder role stores attestations that its owner treats as confidential, such as ultimate beneficial ownership and control structure. In the BU use cases, requests arrive backend to backend with no person present. The Holder EBW must decide alone, so it needs three answers a machine can check:
 
-The wallet unit attestations therefore increases trust in the integrity of the requesting software and significantly reduces the risk of impersonation of the requesting Relying Party. The wallet unit attestation revocation status also shows that the wallet is not revoked (e.g. due to compromise, ...)
+1. Which legal entity is asking?
+2. Is the requesting software a real wallet unit, and is it still valid?
+3. Does the owner's policy allow this entity to receive this attestation?
 
-From an holder security, confidentiality and legal perspective the requesters identification should be based on the EBWOID and the requesting software authenticity and components validity should be based on the WUA. Currently an EBWOID and a WUA are issued only to EBWs. Therefore a request made by a software component that is not part of the EBW like for example an "EUDI Wallet Relying Party Component" or an “EBW Relying Party Component" requesting confidential attestations will be ignored by EBW owners due to confidentiality, security and legal concerns. A Relying Party software component is less secure than an EBW. 
+The proposed Regulation on the establishment of European Business Wallets, COM(2025) 838 final of 19 November 2025, addresses this in its Annex. Point 14(2)(b) states that "where Business Wallet owners use their Business Wallets unit to interact with competent national authorities and providers of electronic attestations of attributes, Wallet units shall enable authentication and validation of the Wallet unit components by presenting the Wallet unit attestations to those competent national authorities and providers upon their request".
 
-Perspective of the EBW Relying Party role:
+Point 14 covers the issuance direction, and CS-01 already implements it. The proposal places no equivalent obligation on a party that requests attestations from a Wallet unit. That gap is what this decision fills.
 
-Legal entities that already use a Relying Party component software (as defined by eIDAS2.0) for transactions with the EUDI wallet for natural person are interested that also EBW owners answer requests made to an EBW by a Relying Party component.  These legal entities are also interested to use the same component as a “EBW Relying Party component”
+**We already solve this for issuance.** In CS-01, a Wallet Unit proves what it is before an Issuer releases anything: it authenticates with an attestation bound to the key used in the transaction, the attestation is checked against the Trusted List for Wallet Providers, and revocation is checked (CS-01 sections 7.3 to 7.5, CS-04 section 7.2).
 
-Perspective of the Wallet Providers:
+**In presentation, the rule applies in one direction only.** CS-02 section 7.2, item 6 requires the Verifier to validate the Holder's Wallet Unit Attestation. Nothing requires the Verifier to identify the legal entity behind it, or to show that it is itself a valid wallet unit. The request carries no EBWOID and no BWUA.
 
-Wallet providers may be interested to offer verification services based o a software component that has no Holder funtionality and does not contain attestations like the EBWOID and the WUA. Therefore they may be interested that identification of the verification component can be done also based on x.509 certificates comparable to the Access Certificate. However such a certificate is not a wallet bound issued certificate and therefore less secure from holder perspective and does not has the same legal value as the EBWOID.
+The requester already holds both. An EBW is a single wallet unit that plays the Holder, Issuer and Verifier roles ([BWUA based on TS3](bwua-ts3-attestation.md), CS-02 chapter 4). Nothing new has to be issued to it. What is missing is an agreed way to present what it already holds.
 
-2. Currently it is not defined how mutual identification between EBWs without human interaction is performed and the "OpenID for Verifiable Presentations (OID4VP) Specification" specifies:
+### Where this material travels
 
-- "The verifierInfo parameter allows the verifier to provide additional context or metadata as part of the authorization request. The verifierInfo parameter is optional. Wallets MAY use them to make authorization decisions or to enhance the user experience, but they SHOULD ignore any unrecognized or unsupported Verifier Info types."
-We need a new verifierInfo type that includes at least the EBWOID and the WUA. This verifierInfo object SHOULD be used to request confidential attestations.
+Commission Implementing Regulation (EU) 2026/1731 of 15 July 2026 amends Implementing Regulations (EU) 2024/2977, 2024/2979, 2024/2980 and 2024/2982 as regards applicable standards. Its Annex XII, added as Annex II to 2024/2982, states that "the technical specifications in clauses 4.1, 4.2, 5, and 6 of ETSI TS 119 472-2 V1.2.1 (2026-03), shall apply with the following adaptations, including the insertion of a new clause 4.3".
 
-We may need additional verifierInfo types based on x.509 certificates that can be used
+Two requirements of that specification are relevant here:
 
-The  verifierInfo parameter MUST be made mandatory to avoid unnecessary denies from holder EBWs due to missing verifierInfo objects. 
-- We need an interaction specification between relying party and holder EBW backends during a presentation request that does not require human interaction and that includes mutual authentication based on the above new verifierInfo object
+> OIDFVP-HAIP-COMMON-REQ-01: The Authorization Request shall use the Client Identifier Prefix `x509_hash`.
+> OIDFVP-HAIP-COMMON-REQ-RO-01: The RO JWT body shall contain the `verifier_info` parameter.
 
-The rulebook for mutual identification and consent handshake referencing also the rulebook for basic attestation verification describes the proposed solution: [https://github.com/flo0x/webuild-attestations/blob/main/rulebooks/rb-base/holder-authorization-handshake.md]
-Note: The version available under the above link contains BU1 feedback and will replace the released version currently available under [https://github.com/webuild-consortium/webuild-attestation-rulebooks-catalog/blob/main/rulebooks/rb-base/holder-authorization-handshake.md].
-The two rulebooks describe mutual identification steps and basic verification steps required for all attestations and are part of the BU1 rulebooks.
+So for presentations to EUDI Wallets, `verifier_info` is the mandatory channel for Relying Party identity, and the Client Identifier Prefix is fixed. These obligations apply to EUDI Wallets and to relying parties requesting from them.
 
-# Decision:
+**Two things they do not settle.** First, the profile identifies the relying party but does not establish that the requester is a valid wallet unit, which is question 2 above. Second, EBW-to-EBW traffic is not within the scope of those acts. The Business Wallet Regulation is still in negotiation: the Council agreed its position on 9 June 2026, recital 4 of the Commission proposal states that the eIDAS specifications "should apply, with the specifications laid down in this Regulation taking precedence in the event of any inconsistency", and recitals 20 and 28 foresee Business-Wallet-specific technical specifications. Producing evidence for those specifications is a purpose of this pilot.
 
-What change did we agree to?
+## Decision
 
-1. A new verifierInfo type will be defined [Where?]. The new verifierInfo type MUST contain an EBWOID and a WUA  attestations. The verifierInfo parameter in an authorization request MUST become a mandatory parameter.
-An attestation request for confidential attestations from a Relying Party software MAY be answered or denied by the EBW owner based on his internal policies.
+This decision changes nothing in OpenID4VP, nothing in the CS-02 request and response flows, and nothing in the attestations defined in CS-04 and CS-05. It defines two WE BUILD `verifier_info` formats, states how they are bound to the request and validated, and separates that content from the choice of Client Identifier Prefix.
 
-2. The Wallet Provider group will update the corresponding conformance specification [https://github.com/webuild-consortium/wp4-architecture/blob/main/conformance-specs/cs-02-credential-presentation.md] if the requirements resulting from the above rulebooks and this ADR are not fully included. Key requirements and goals are that a presentation can be performed without human interaction and that a presentation request includes mutual identification based on the above new verifierInfo object and the above rulebooks.
+### 1. The requesting EBW identifies itself in `verifier_info`
 
-3. The above rulebooks should be included also in other attestation rulebooks
+An EBW acting as Verifier includes two elements in the `verifier_info` array of the Request Object, in addition to the elements ETSI TS 119 472-2 already requires:
 
+| `format` | Content | Answers |
+| --- | --- | --- |
+| `ebwoid` | An EBWOID presentation, as defined in rb-ebwoid, with its Key Binding JWT | Which legal entity is asking |
+| `ebw_wallet_unit` | A BWUA presentation, as defined in CS-05, with its Key Binding JWT, carrying the wallet unit identifier and its status reference | Whether the requester is a valid, unrevoked wallet unit |
 
-# Consequences
+Neither element contains the `credential_ids` member, following OIDFVP-HAIP-COMMON-REQ-RO-03 and RO-14. Both are key-bound presentations, so the Holder can tell them apart by `format` without inspecting the payload.
 
-What becomes easier?
+Example (illustrative values):
 
-1. EBW owner will accept to present requested confidential attestations if the request is received from an EBW wallet with the new verfierInfo object according to their internal policies. They will not deny a request simply because the request is made via a Relying Party software.
+```json
+"verifier_info": [
+  { "format": "registrar_dataset",  "data": "…" },
+  { "format": "ebwoid",             "data": "<EBWOID~disclosures~KB-JWT(nonce, aud)>" },
+  { "format": "ebw_wallet_unit",    "data": "<BWUA~KB-JWT(nonce, aud)>" }
+]
+```
 
-2. Attestation request to an EBW backend based on OID4VCP protocols can be received and answered without natural person interaction. That is a mandatory prerequisite for BU use cases for the integration of the EBW in internal systems
+**2. Binding.** The Key Binding JWT of each presentation shall contain:
 
-3. We avoid that different rulebooks create different basic attestation rulebooks. The basic verification rulebook also explains how attestation chaining can be used to verify EAAs also after Web Build end.
+- `nonce`: the `nonce` of the Presentation Request, which gives freshness;
+- `aud`: the `client_id` of the Presentation Request, which ties the presentation to the requesting party and prevents it being copied into another party's request.
 
-What becomes more difficult?
+A Holder EBW that uses these elements shall verify both values, as OpenID4VP section 5.11 requires the Wallet to "validate the signature and ensure binding".
 
-1. Legal entities that use a Relying Party component will not be able to create the new verifierInfo object because they do not have the EBWOID, the WUA and also no wallet bound attestations. As a consequence several Holder EBW  will deny requests for confidential data made through the Relying Party software due to confidentiality, security and legal concerns (e.g. impersonation risk). The same EBW owner probably will answer a request made through an EBW by the same legal entity.
+**3. Validation.** For each element the Holder EBW shall verify the issuer's signature and the validity of the presentation, then check revocation:
 
-2. Without a common understanding between use case participants in different role (for example banks that want to use the EUDI Relying party component and their customers) the KyC and also PA3 use case can not be scaled.
+- the EBWOID presentation according to rb-ebwoid, with the issuer validated against the eIDAS Trusted List;
+- the BWUA presentation according to CS-05, with the Wallet Provider validated against the Trusted List for Wallet Providers, as CS-01 section 7.4 already does for issuance.
 
-How do we address the risks introduced by this change?
+If either check fails, the request is refused. Unknown or unsupported `verifier_info` elements are ignored, as OpenID4VP already provides.
 
-- The “EBW Relying Party component” is enabled by their providers to receive and store “EBW Relying Party component “ bound attestations like EBWOID and WUA and therefore able to create the verifierInfo object during a request for confidential data. That can be implemented by providing also the holder component to a verifier service, even if the customer of the Wallet Provider uses only the RP component.
-- Additional verifierInfo object are defined based on other attestations and certificates that may be accepted by EBW holders for requests that do not require the presentation of confidential data.
-- The fact that the use of an EBW wallet for requesting confidential data reduces the risk for the EBW holder must be explained and actively communicated to the RP legal entities that want to (re)use exclusively EUDI Relying Party components
+### 2. The formats are independent of the Client Identifier Prefix
+
+The content defined above is carried in the Request Object body and remains valid under any Client Identifier Prefix. This decision therefore separates the two questions:
+
+- **Towards EUDI Wallets**, an EBW acting as Verifier uses the `x509_hash` prefix, as ETSI TS 119 472-2 clause 6 requires through Annex II of Implementing Regulation (EU) 2024/2982. Nothing in this decision changes that direction, and no EUDI Wallet is required to recognise the WE BUILD formats.
+- **Business Wallet-Native Model (Certificate-Free)**: The requester authenticates by proving possession of its core identity credential. In this model, the Request Object MUST be signed by the private key corresponding to the signing_key attested within the EBWOID itself. This path eliminates the need for any external Access Certificate.
+
+**No certificate obligation is created for EBW-to-EBW traffic by this decision.** Only `x509_hash` requires the requester to hold an X.509 wallet-relying party access certificate, issued under Implementing Regulation (EU) 2025/848, together with registration in an RP registrar. Nothing in the acts currently in force applies that requirement to requests between two Business Wallets. The pilot shall implement and measure at least one certificate-based and one certificate-free option, and report the operational cost of each, so that the choice for the Business Wallet specifications rests on evidence.
+
+### 3. When the elements are required
+
+An EBW acting as Verifier shall include both elements in every Presentation Request addressed to another EBW, or requesting an attestation type governed by an EBW rulebook. An EBW always holds an EBWOID and a BWUA, so it can always comply. An attestation rulebook MAY declare that a given attestation type shall not be released unless the request carries both valid elements, and an owner MAY apply stricter rules for its own wallet. Valid elements do not by themselves give a right to a response.
+
+**This obligation does not apply to interactions with EUDI Wallets.** In that direction the EBW sends the `verifier_info` elements ETSI TS 119 472-2 requires and nothing further.
+
+Verifiers that are not EBWs are not excluded in the other direction either. Their requests carry neither element, and the Holder decides what to release under Decision 4.
+
+### 4. One place where policy is decided
+
+The validated elements are inputs to the automatic approval list from [EBW EAA exchange automation](EBW-EAA-exchange-automation.md), not a second gate in front of it. The list is keyed on the EBWOID and the attestation type. Where the owner approved a requester and attestation combination in advance, that approval is the Holder's consent for CS-02 section 7.1, and the wallet unit shall record the release and show it to the owner. Otherwise it shall ask the owner or reject. The choice of Client Identifier Prefix does not affect this list.
+
+### Processing summary for the receiving EBW
+
+| Step | Check | Depends on the prefix? |
+| --- | --- | --- |
+| 1 | Client authentication, as the chosen prefix defines | Yes |
+| 2 | `ebwoid` element: issuer signature, validity, revocation, eIDAS Trusted List | No |
+| 3 | `ebw_wallet_unit` element: issuer signature, validity, status, Trusted List for Wallet Providers | No |
+| 4 | Key Binding JWT of each element: `nonce` and `aud` match the request | No |
+| 5 | Owner's approval list, keyed on the EBWOID, then release and log, or ask the owner | No |
+
+### What this decision does not change
+
+| Area | Already decided in |
+| --- | --- |
+| Client Identifier Prefix, Request Object structure and mandatory `verifier_info` content towards EUDI Wallets | ETSI TS 119 472-2 V1.2.1 clause 6, applied by CIR (EU) 2026/1731 Annex XII |
+| Protocols | [Baseline protocols](base-protocols.md) |
+| OpenID4VP request and response processing | OpenID4VP 1.0, used as published |
+| EBWOID claims, encoding, trust model, revocation | rb-ebwoid, authoritative |
+| Attestation structure, validity, revocation, binding | CS-04 for the WUA, CS-05 for the BWUA, both authoritative |
+| Trust lists | [Trusted lists](trusted-lists.md), applied in CS-01 section 7.4 |
+| What a Verifier checks in a response | CS-02 section 7.2, item 6 |
+
+## Consequences
+
+### What becomes easier?
+
+A Holder EBW can identify the requesting legal entity and check that its wallet unit is sound and not revoked, using credentials the requester already holds and verification paths its implementation already runs. Owners can accept requests they refuse today.
+
+Requests can be answered without a person present, which is a precondition for using the EBW inside internal systems. Consent is given once, by the owner, in a list the owner controls.
+
+The material travels in the parameter the EUDI profile already mandates, so an implementation that meets ETSI TS 119 472-2 adds two array elements on the sending side and two validation routines on the receiving side. Nothing new has to be issued, and no verifier-side attestation has to be kept in step with the BWUA.
+
+Because the formats are independent of the Client Identifier Prefix, the pilot can test more than one prefix without changing the payload, and the decision survives whatever the Business Wallet specifications settle on.
+
+### What becomes more difficult?
+
+Wallet Providers and EBWOID issuers must support presentation of these credentials by an EBW acting in the Verifier role, including key binding to a request the EBW itself creates.
+
+Owners must decide which attestations are confidential. Classification will vary until common practice develops.
+
+Requesters without an EBWOID and a BWUA will not receive confidential attestations. For KYC and PA3 this must be explained before participants design their integration.
+
+Running two prefixes during the pilot costs implementation effort on the Holder side. This is deliberate, so that the cost of each option is measured rather than assumed.
+
+### Open items this decision depends on
+
+1. **EBWOID revocation** is not yet fully specified in rb-ebwoid. Decision 1 depends on a revocation check.
+2. **Status checking for the BWUA presentation** in the Verifier direction must be confirmed against CS-05, including what a Holder does when the status cannot be checked.
+3. **Registrar data in EBW-to-EBW traffic.** OIDFVP-HAIP-COMMON-REQ-RO-02 requires `verifier_info` to carry RP Registrar-provided data. Whether an EBW acting as Verifier towards another EBW registers with an RP Registrar, or whether the two WE BUILD elements stand in its place for that traffic, must be decided explicitly.
+4. **Backend-to-backend transport for a Presentation Request** is not defined in CS-02, whose invocation flows assume a person. This blocks the BU use cases independently of this decision.
+5. **CS-02 section 7.1 forbids auto-consent**, while [EBW EAA exchange automation](EBW-EAA-exchange-automation.md) requires sharing without human approval for M2M scenarios. Decision 4 treats a prior owner approval as consent; the conflict between those documents predates this decision.
+6. **Format identifier registration.** The values `ebwoid` and `ebw_wallet_unit` should be recorded wherever WE BUILD registers Verifier Info format identifiers, so that they do not collide with a future ETSI or OpenID Foundation registration.
+
+### How do we address the risks introduced by this change?
+
+The pre-flight specification should publish a default classification for the BU1 attestation types, so owners start from a common baseline.
+
+WE BUILD should report to ETSI and to the Commission that the current presentation profile conveys relying party identity but not wallet unit validity, and that EBW-to-EBW traffic needs an explicit answer on the Client Identifier Prefix and on relying party registration. The pilot's measurements from Decision 2 are the evidence for that report.
+
+## References
+
+- Commission Implementing Regulation (EU) 2026/1731 of 15 July 2026, Annex XII, added as Annex II to Implementing Regulation (EU) 2024/2982
+- ETSI TS 119 472-2 V1.2.1 (2026-03), clause 6
+- Commission Implementing Regulation (EU) 2025/848 on registration of wallet-relying parties
+- [OpenID for Verifiable Presentations 1.0](https://openid.net/specs/openid-4-verifiable-presentations-1_0.html), sections 5.9.3 and 5.11
+- COM(2025) 838 final, proposal for a Regulation on European Business Wallets, recitals 4, 20 and 28
+
+## Advice
+
+Once merged, this is our consortium's decision. This does not mean all participants agree it is the best possible decision. In the decision-making process, we have heard the following advice.
+
+- All authors / Contributors
+- yyyy-mm-dd, Name, Affiliation, Country: OK or summary of advice
