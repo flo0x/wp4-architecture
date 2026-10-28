@@ -258,7 +258,7 @@ Verify if your component can successfully verify:
    | PID Issuer | Location | Remarks |
       |:---|:---|:---|
    | EUDI Wallet demo application | [PID Issuer Portal](https://issuer.eudiw.dev/display_credential_offer) | Define your own PID based on your data. Note: this demo issuer is not registered in the Webuild trusted list. |
-   | Credenco Wallet | [Credenco Playground](https://playground.credenco.com/webuild) | Dutch playground providing 6 predefined PIDs for testing. |
+   | Credenco Wallet | [Credenco Playground](https://playground.credenco.com/webuild) | Dutch playground |
 
 3. Fill in the required data fields.
 4. **Accept in Wallet:** Scan the generated QR code with your mobile EUDI Wallet and accept.
