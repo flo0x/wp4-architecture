@@ -274,8 +274,17 @@ Verify if your component can successfully verify:
 
 ##### 5.2.1 How to Obtain
 1. **Get Authorized Person Data:** Access public registers to retrieve information about the legal representative (Name, Surname, Birthdate, Location).
-    * *Fallback:* If not available in the public register, check with Bundesanzeiger (BANZ) to use standard test personas.
-2. **Initiate Request:** Navigate to the [Bundesanzeiger Attested Issuance Page](https://eida-issuer.spherity.dev/attested-issuance).
+    * *Fallback:* If not available in the public register, check with EBWOID Providers to use standard test personas.
+2. **Initiate Request:** Navigate to the EBWOID Provider page 
+
+   | Register Name      | Covered Countries                  | Direct Access Portal Link                                                                   |
+   |:-------------------|:-----------------------------------|:--------------------------------------------------------------------------------------------|
+   | **Bundesanzeiger** | DE, AT, PL, CH, etc. (8 Countries) | [Bundesanzeiger Attested Issuance Page](https://eida-issuer.spherity.dev/attested-issuance) |
+   | **Infogreffe**     | FR                                 | to be filled                                                                                |
+   | **InfoCert**       | IT                                 | to be filled  |
+   | **Bolagsverket**   | SE                                 | to be filled  |
+
+In case if *Bundesanzeiger* selection
 3. **Select Attestation:** Click on **EBWOID Attestation**.
 4. **Identify Company:** Search and select your company name.
 5. **Scan & Present PID:** Use your EUDI Wallet (with the PID obtained in 5.1) to scan the QR code and authorize.
