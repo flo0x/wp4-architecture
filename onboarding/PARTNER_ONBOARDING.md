@@ -333,8 +333,6 @@ In case if *Bundesanzeiger* selection
 
 #### 5.4. Company Self-Attested Attestation (Self-EAA)
 
-##### 5.4.1 How to Create It
-
 | Name | Rulebooks |
 |:---|:---|
 | **CompanyInfo** | [rb-company-info](https://github.com/webuild-consortium/webuild-attestation-rulebooks-catalog/tree/main/rulebooks/rb-company-info) |
@@ -345,13 +343,14 @@ In case if *Bundesanzeiger* selection
 | **UBO** | [rb-ubo](https://github.com/webuild-consortium/webuild-attestation-rulebooks-catalog/tree/main/rulebooks/rb-ubo) |
 | **AuthorisedSignatories** | [rb-authorised-signatories](https://github.com/webuild-consortium/webuild-attestation-rulebooks-catalog/tree/main/rulebooks/rb-authorised-signatories) |
 
-##### 5.4.2 How to Obtain It for the Legal Entity (Company)
-1. **Open Wallet & Load Schemas:** Open your company wallet and ensure the rulebook schemas are imported.
-2. **Prepare Data:** Gather the mandatory data fields for each attestation (template/demo data can be extracted from the rulebook definitions).
-3. **Trigger Issuance:** Start the issuer process, input the prepared metadata, and copy the generated Credential Offer.
-4. **Accept in Wallet:** Paste the offer into your company wallet, review, and confirm acceptance.
 
-##### 5.4.3 🛠️ Prepare Proof Request (RP)
+##### 5.4.1 How to Obtain It for the Legal Entity (Company)
+1. **Open Wallet & Load Schemas:** Open your company wallet and ensure the rulebook schemas are imported.
+3. **Prepare Data:** Gather the mandatory data fields for each attestation (template/demo data can be extracted from the rulebook definitions).
+4. **Trigger Issuance:** Start the issuer process, input the prepared metadata, and copy the generated Credential Offer.
+5. **Accept in Wallet:** Paste the offer into your company wallet, review, and confirm acceptance.
+
+##### 5.4.2 🛠️ Prepare Proof Request (RP)
 
 1. **Import Schemas:** Import the schemas into your EBW Company Wallet.
 
